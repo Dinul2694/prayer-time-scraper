@@ -9,8 +9,8 @@ The **Prayer Time Scraper** is a Java-based tool using Jsoup to extract and disp
 - **Customizable** to adapt to different website structures.
 
 ## Prerequisites
-- **Java 8** or higher
-- **Maven** (for dependency management)
+- **Java 17**
+- **Gradle** (for build automation)
 
 ## Installation
 
@@ -24,9 +24,9 @@ The **Prayer Time Scraper** is a Java-based tool using Jsoup to extract and disp
     cd prayer-time-scraper
     ```
 
-3. **Build the project using Maven**:
+3. **Build the project using Gradle**:
     ```bash
-    mvn clean install
+    ./gradlew build
     ```
 
 ## Usage
@@ -36,4 +36,4 @@ The **Prayer Time Scraper** is a Java-based tool using Jsoup to extract and disp
 2. **Run the scraper**: Execute the main class from the command line or through your IDE.
 
    ```bash
-   java -cp target/prayer-time-scraper-1.0-SNAPSHOT.jar com.example.PrayerTimeScraper
+   java -cp build/libs/prayer-time-scraper-1.0.jar com.example.PrayerTimeScraper
