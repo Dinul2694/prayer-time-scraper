@@ -30,9 +30,9 @@ public class ScrapingService {
                 var jumuahRow = prayerTableBody.select("tr").remove(5);
 
                 // rows of standard prayers (elements)
-                var standardRows = prayerTableBody.select("tr");
+                var standardPrayerRows = prayerTableBody.select("tr");
 
-                log.info("standard rows: \n{}",standardRows);
+                log.info("standard rows: \n{}",standardPrayerRows);
                 log.info("sunrise row: \n{}",sunriseRow);
                 log.info("jumuah row: \n{}",jumuahRow);
 
