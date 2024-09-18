@@ -35,6 +35,7 @@ public class ScrapingService {
                 log.info("standard rows: \n{}",standardPrayerRows);
                 log.info("sunrise row: \n{}",sunriseRow);
                 log.info("jumuah row: \n{}",jumuahRow);
+                log.info("testing");
 
             } else {
                 throw new IllegalArgumentException("Could not find any tables");
