@@ -1,7 +1,8 @@
 # Prayer Time Scraper
 
 ## Overview
-The **Prayer Time Scraper** is a Java-based tool using Jsoup to extract and display prayer times from various online sources. This tool helps users get accurate prayer times for different locations.
+The **Prayer Time Scraper** is a Java-based tool using Jsoup to extract and display prayer times from various online sources. This tool helps users get accurate prayer times for Masjid Bilal Luton and
+other locations in future releases.
 
 ## Features
 - **Scrapes prayer times** from specified websites.
