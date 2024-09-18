@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -19,22 +21,14 @@ public class ScrapingService {
             var prayerTableHtml = getPrayerTableFromMasjidBilal(Jsoup.connect(URL).get());
 
             if (prayerTableHtml.isPresent()){
+                Map<String,Prayer> prayersMap=null;
                 var prayerTableBody = prayerTableHtml.get().select("tbody");
 
-                // removed first 2 rows as they were unnecessary
-                prayerTableBody.select("tr").remove(0);
-                prayerTableBody.select("tr").remove(0);
+                for (int i = 2; i < prayerTableBody.size(); i++) {
+                    prayersMap = populatePrayerMap(prayersMap,prayerTableBody);
+                }
 
-                //segregated sunrise and jumuah rows (single element each)
-                var sunriseRow = prayerTableBody.select("tr").remove(1);
-                var jumuahRow = prayerTableBody.select("tr").remove(5);
-
-                // rows of standard prayers (elements)
-                var standardPrayerRows = prayerTableBody.select("tr");
-
-                log.info("standard rows: \n{}",standardPrayerRows);
-                log.info("sunrise row: \n{}",sunriseRow);
-                log.info("jumuah row: \n{}",jumuahRow);
+                log.info("prayers: {}",prayersMap);
 
             } else {
                 throw new IllegalArgumentException("Could not find any tables");
@@ -45,6 +39,21 @@ public class ScrapingService {
             log.info("Error, Jsoup could not connect to URL provided: {}",e.getMessage());
         }
 
+    }
+
+    private static Map<String, Prayer> populatePrayerMap(Map<String, Prayer> prayersMap, Elements prayerTableBody) {
+        // implement popping prayer rows from table body and create prayer object
+        var prayerTableRow = prayerTableBody.select("tr").remove(0);
+        var prayerName = prayerTableRow.select("th.prayerName").text();
+
+        if (!prayerName.equals("Sunrise") && !prayerName.equals("Jumuah")){
+            var startTime = prayerTableRow.select("td.begins").text();
+            var jamaatTime = prayerTableRow.select("td.jamah").text();
+            Prayer prayer = new Prayer(prayerName, startTime, jamaatTime);
+            prayersMap.put(prayerName,prayer);
+        }
+
+        return prayersMap;
     }
 
     private static Optional<Element> getPrayerTableFromMasjidBilal(Document masjidBilalInfo) {
