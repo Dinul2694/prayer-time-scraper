@@ -6,6 +6,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,11 +23,12 @@ public class ScrapingService {
             var prayerTableHtml = getPrayerTableFromMasjidBilal(Jsoup.connect(URL).get());
 
             if (prayerTableHtml.isPresent()){
-                Map<String,Prayer> prayersMap=null;
                 var prayerTableBody = prayerTableHtml.get().select("tbody");
 
-                for (int i = 2; i < prayerTableBody.size(); i++) {
-                    prayersMap = populatePrayerMap(prayersMap,prayerTableBody);
+                Map<String,Prayer>  prayersMap = new LinkedHashMap<>();
+
+                for (int i = 2; i < prayerTableBody.select("tr").size(); i++) {
+                    populatePrayerMap(prayersMap, prayerTableBody,i);
                 }
 
                 log.info("prayers: {}",prayersMap);
@@ -41,19 +44,17 @@ public class ScrapingService {
 
     }
 
-    private static Map<String, Prayer> populatePrayerMap(Map<String, Prayer> prayersMap, Elements prayerTableBody) {
-        // implement popping prayer rows from table body and create prayer object
-        var prayerTableRow = prayerTableBody.select("tr").remove(0);
+    private static void populatePrayerMap(Map<String, Prayer> prayersMap, Elements prayerTableBody, int i) {
+        var prayerTableRow = prayerTableBody.select("tr").get(i);
         var prayerName = prayerTableRow.select("th.prayerName").text();
 
-        if (!prayerName.equals("Sunrise") && !prayerName.equals("Jumuah")){
+        if (!prayerName.equals("Sunrise") && !prayerName.isEmpty()){
             var startTime = prayerTableRow.select("td.begins").text();
             var jamaatTime = prayerTableRow.select("td.jamah").text();
             Prayer prayer = new Prayer(prayerName, startTime, jamaatTime);
             prayersMap.put(prayerName,prayer);
         }
 
-        return prayersMap;
     }
 
     private static Optional<Element> getPrayerTableFromMasjidBilal(Document masjidBilalInfo) {
