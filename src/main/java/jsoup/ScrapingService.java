@@ -27,14 +27,12 @@ public class ScrapingService {
 
                 //segregated sunrise and jumuah rows (single element each)
                 var sunriseRow = prayerTableBody.select("tr").remove(1);
-                var jumuahRow = prayerTableBody.select("tr").remove(5);
 
                 // rows of standard prayers (elements)
                 var standardPrayerRows = prayerTableBody.select("tr");
 
                 log.info("standard rows: \n{}",standardPrayerRows);
                 log.info("sunrise row: \n{}",sunriseRow);
-                log.info("jumuah row: \n{}",jumuahRow);
 
             } else {
                 throw new IllegalArgumentException("Could not find any tables");
