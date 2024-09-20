@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.util.Optional;
 
@@ -34,6 +35,8 @@ public class ScrapingService {
                 log.info("standard rows: \n{}",standardPrayerRows);
                 log.info("sunrise row: \n{}",sunriseRow);
 
+                createPrayerEvents(standardPrayerRows,sunriseRow);
+
             } else {
                 throw new IllegalArgumentException("Could not find any tables");
             }
@@ -43,6 +46,10 @@ public class ScrapingService {
             log.info("Error, Jsoup could not connect to URL provided: {}",e.getMessage());
         }
 
+    }
+
+    private static void createPrayerEvents(Elements standardPrayerRows, Element sunriseRow) {
+        
     }
 
     private static Optional<Element> getPrayerTableFromMasjidBilal(Document masjidBilalInfo) {
