@@ -37,4 +37,4 @@ out/
 .vscode/
 
 # Ignore credentials file
-credentials.json
+src/main/resources/credentials.json

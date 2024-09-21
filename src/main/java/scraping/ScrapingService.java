@@ -1,5 +1,7 @@
 package scraping;
 
+import googlecalendar.GoogleAuth;
+import googlecalendar.GoogleCalendarService;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -7,38 +9,63 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
 @NoArgsConstructor
 public class ScrapingService {
-    public static final String URL = "https://www.masjidbilal.uk/";
-    public static void main(String[] args) throws IllegalArgumentException {
+    private static final String URL = "https://www.masjidbilal.uk/";
+    private final GoogleCalendarService calendarService = new GoogleCalendarService();
+
+    public static void main(String[] args) {
+        ScrapingService service = new ScrapingService();
+        service.scrapeAndSendToGoogleCalendar();
+    }
+
+    public void scrapeAndSendToGoogleCalendar() {
         try {
-            // Select prayer table, assuming it is first table in tbody
-            var prayerTableHtmlData = getPrayerTableFromMasjidBilal(Jsoup.connect(URL).get());
-            if (prayerTableHtmlData.isPresent()){
-                var prayerData = prayerTableHtmlData.get().select("tbody");
+            var document = fetchDocument(URL);
+            var prayerTable = getPrayerTable(document);
+
+            if (prayerTable.isPresent()) {
+                var prayerData = prayerTable.get().select("tbody");
                 cleanData(prayerData);
-                // rows of standard prayers (elements)
-                log.info("prayer table rows: \n{}", prayerData.select("tr"));
+                log.info("Sending prayer data to Google Calendar...");
+                sendPrayerDataToCalendar(prayerData);
             } else {
-                throw new IllegalArgumentException("Could not find any tables");
+                log.error("Prayer table not found on the page.");
             }
         } catch (Exception e) {
-            log.info("Error encountered, error message is: {}",e.getMessage());
+            log.error("An error occurred: {}", e.getMessage());
         }
-
     }
 
-    private static void cleanData(Elements prayerTableBody) {
-        // removed first 2 rows as they were unnecessary
+    private void sendPrayerDataToCalendar(Elements prayerTableBody) {
+        for (Element row : prayerTableBody.select("tr")) {
+            String prayerName = row.select("th.prayerName").text();
+            String begins = row.select("td.begins").text();
+            String jamaat = row.select("td.jamah").text();
+
+            if (!prayerName.isEmpty() && !begins.isEmpty()) {
+                calendarService.createEvent(prayerName, begins, jamaat.isEmpty() ? begins : jamaat);
+            }
+        }
+    }
+
+    private void cleanData(Elements prayerTableBody) {
+        log.info("Cleaning prayer table data...");
         prayerTableBody.select("tr").remove(0);
         prayerTableBody.select("tr").remove(0);
     }
 
-    private static Optional<Element> getPrayerTableFromMasjidBilal(Document masjidBilalInfo) {
-        return Optional.ofNullable(masjidBilalInfo.select("table").first());
+    private Document fetchDocument(String url) throws IOException {
+        log.info("Fetching document from URL: {}", url);
+        return Jsoup.connect(url).get();
     }
 
+    private Optional<Element> getPrayerTable(Document document) {
+        log.info("Selecting prayer table from document...");
+        return Optional.ofNullable(document.select("table").first());
+    }
 }
