@@ -18,11 +18,6 @@ public class ScrapingService {
     private static final String URL = "https://www.masjidbilal.uk/";
     private final GoogleCalendarService calendarService = new GoogleCalendarService();
 
-    public static void main(String[] args) {
-        ScrapingService service = new ScrapingService();
-        service.scrapeAndSendToGoogleCalendar();
-    }
-
     public void scrapeAndSendToGoogleCalendar() {
         try {
             var document = fetchDocument(URL);
