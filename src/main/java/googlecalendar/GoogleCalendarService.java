@@ -13,6 +13,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
 
 @Slf4j
 public class GoogleCalendarService {
@@ -46,13 +47,11 @@ public class GoogleCalendarService {
             var endDateTime = endTime.atZone(ZoneId.of(EUROPE_LONDON)).toInstant();
 
             // Set event reminders
-            EventReminder[] reminderOverride = new EventReminder[] {
-                    new EventReminder().setMethod("popup").setMinutes(10)
-            };
+            EventReminder reminderOverride = new EventReminder().setMethod("popup").setMinutes(10);
 
             Event.Reminders reminders = new Event.Reminders()
                     .setUseDefault(false)
-                    .setOverrides(Arrays.asList(reminderOverride));
+                    .setOverrides(Collections.singletonList(reminderOverride));
 
             // Set event start, end times and reminders
             event.setStart(new EventDateTime()
