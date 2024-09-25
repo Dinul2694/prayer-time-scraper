@@ -3,6 +3,7 @@ package googlecalendar;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 @Slf4j
 public class GoogleCalendarService {
@@ -43,10 +45,20 @@ public class GoogleCalendarService {
             var startDateTime = startTime.atZone(ZoneId.of(EUROPE_LONDON)).toInstant();
             var endDateTime = endTime.atZone(ZoneId.of(EUROPE_LONDON)).toInstant();
 
-            // Set event start and end times
+            // Set event reminders
+            EventReminder[] reminderOverride = new EventReminder[] {
+                    new EventReminder().setMethod("popup").setMinutes(10)
+            };
+
+            Event.Reminders reminders = new Event.Reminders()
+                    .setUseDefault(false)
+                    .setOverrides(Arrays.asList(reminderOverride));
+
+            // Set event start, end times and reminders
             event.setStart(new EventDateTime()
                     .setDateTime(new com.google.api.client.util.DateTime(startDateTime.toString()))
-                    .setTimeZone(EUROPE_LONDON));
+                    .setTimeZone(EUROPE_LONDON))
+                    .setReminders(reminders);
             event.setEnd(new EventDateTime()
                     .setDateTime(new com.google.api.client.util.DateTime(endDateTime.toString()))
                     .setTimeZone(EUROPE_LONDON));
